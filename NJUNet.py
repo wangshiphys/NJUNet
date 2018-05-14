@@ -1,5 +1,11 @@
+"""
+Python script for login and logout the NJU network account
+"""
+
+
 from urllib import parse, request
 
+import argparse
 import json
 
 
@@ -61,7 +67,7 @@ def logout():
     return response
 
 
-def ShowResponse(response, verbose=False):
+def ShowResponse(response, *, verbose=False):
     """
     Show the response from the server
 
@@ -87,46 +93,37 @@ def ShowResponse(response, verbose=False):
         print(f"reply_msg: {response['reply_msg']}")
 
 
-if __name__ == "__main__":
-    from getpass import getpass
-
-    import argparse
+def ArgParser():
+    """
+    Parsing the command line arguments
+    """
 
     parser = argparse.ArgumentParser(
         description="Login or logout the NJU network account!"
     )
     parser.add_argument(
         "action", type=str, choices=("login", "logout"),
-        help="Login or logout the NJU network account?."
+        help="Login or logout the NJU network account?"
     )
 
-    parser.add_argument("-u", "--username", type=str, help="The username")
+    parser.add_argument("-u", "--username", type=str, help="The username.")
     parser.add_argument(
         "-v", "--verbose", action="store_true",
         help="Show the full content of the response from the server."
     )
 
-    # Use the `getpass()` function for security
-    # parser.add_argument("-p", "--password", type=str, help="Your password")
-    #
-    # parser.add_argument(
-    #     "--show_password", action="store_true",
-    #     help="Show the password you just input. This option may leak "
-    #          "your password, be careful!!!"
-    # )
-
     args = parser.parse_args()
-    action = args.action
-    username = args.username
-    verbose = args.verbose
-    # password = args.password
-    # show_password = args.show_password
+    return args.action, args.username, args.verbose
 
+
+if __name__ == "__main__":
+    from getpass import getpass
+
+    action, username, verbose = ArgParser()
     if action == "login":
-        password = getpass()
-        # if show_password:
-        #     print(f"The password you just input is: {password}")
-        response = login(username=username, password=password)
+        if username is None:
+            raise ValueError("You must to give a username to login.")
+        response = login(username=username, password=getpass())
     else:
         response = logout()
     ShowResponse(response, verbose=verbose)
