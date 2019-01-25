@@ -122,7 +122,7 @@ if __name__ == "__main__":
     action, username, verbose = ArgParser()
     if action == "login":
         if username is None:
-            raise ValueError("You must to give a username to login.")
+            username = input("Username:")
         response = login(username=username, password=getpass())
     else:
         response = logout()
